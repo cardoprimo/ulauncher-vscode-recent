@@ -6,6 +6,7 @@ import pathlib
 import sqlite3
 import urllib
 import subprocess
+from django.urls import include
 from sqlalchemy import desc
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
@@ -130,6 +131,7 @@ class Code:
         self.config_path = None
         self.global_state_db = None
         self.storage_json = None
+        self.includes_types = None
 
         logger.debug("locating installation and config directories")
         for path in (pathlib.Path(path_dir) for path_dir in Code.path_dirs):
@@ -225,21 +227,26 @@ class Code:
         return self.parse_entry_paths(entries)
 
     @staticmethod
-    def parse_entry_paths(entries):
+    def parse_entry_paths(entries, include_types=("folder")):
         recents = []
+
         for path in entries:
+            logger.info(path)
             if "folderUri" in path:
                 uri = path["folderUri"]
-                icon = "folder"
+                icon = "icon"
                 option = "--folder-uri"
-            # elif "fileUri" in path:
-            #     uri = path["fileUri"]
-            #     icon = "file"
-            #     option = "--file-uri"
-            # elif "workspace" in path:
-            #     uri = path["workspace"]["configPath"]
-            #     icon = "workspace"
-            #     option = "--file-uri"
+                entry_type = "folder"
+            elif "fileUri" in path:
+                uri = path["fileUri"]
+                icon = "file"
+                option = "--file-uri"
+                entry_type = "file"
+            elif "workspace" in path:
+                uri = path["workspace"]["configPath"]
+                icon = "workspace"
+                option = "--file-uri"
+                entry_type = "workspace"
             else:
                 logger.warning("entry not recognized: %s", path)
                 continue
@@ -251,8 +258,12 @@ class Code:
                     "label": label,
                     "icon": icon,
                     "option": option,
+                    "type": entry_type,
                 }
             )
+        # filter the entries to only include types of the include_types
+
+        recents = [recent for recent in recents if recent["type"] in include_types]
         return recents
 
     def open_vscode(self, recent, excluded_env_vars):
@@ -278,6 +289,7 @@ class CodeExtension(Extension):
     keyword = None
     excluded_env_vars = None
     code = None
+    include_types = None
 
     def __init__(self):
         super(CodeExtension, self).__init__()
@@ -362,6 +374,7 @@ class PreferencesEventListener(EventListener):
     def on_event(self, event, extension):
         extension.keyword = event.preferences["code_kw"]
         extension.excluded_env_vars = event.preferences["excluded_env_vars"]
+        extension.include_types = event.preferences["include_types"].split(",")
 
 
 class PreferencesUpdateEventListener(EventListener):

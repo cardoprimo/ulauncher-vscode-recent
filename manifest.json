@@ -15,6 +15,13 @@
 			"id": "excluded_env_vars",
 			"type": "input",
 			"name": "Comma seperated list of env vars to remove when starting vscode, e.g. PYTHONPATH"
+		},
+		{
+			"id": "include_types",
+			"type": "input",
+			"name": "Comma separated list of file_types to include in the search, e.g. [file,folder,workspace]",
+			"default_value": "file,folder,workspace"
+	
 		}
 	]
 }
