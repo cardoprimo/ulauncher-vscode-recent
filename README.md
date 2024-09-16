@@ -10,8 +10,7 @@ Quickly open recently-opened VS Code project directories and files.
 
 - [Ulauncher 5](https://ulauncher.io/)
 - Python >= 3
-- `fuzzywuzzy` module.
-  Install this using `pip`: `pip install fuzzywuzzy`
+
 
 ### Steps
 
@@ -20,7 +19,7 @@ Quickly open recently-opened VS Code project directories and files.
 2. Paste the following URL:
 
 ```
-https://github.com/plibither8/ulauncher-vscode-recent
+https://github.com/burstMembrane/ulauncher-vscode-recent
 ```
 
 This extension should now be set up and work.

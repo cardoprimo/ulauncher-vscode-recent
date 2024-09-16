@@ -6,8 +6,7 @@ import pathlib
 import sqlite3
 import urllib
 import subprocess
-from django.urls import include
-from sqlalchemy import desc
+
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
 from ulauncher.api.shared.event import (
@@ -35,7 +34,7 @@ def command_score(string, abbreviation, aliases=None):
     SCORE_SPACE_WORD_JUMP = 0.9
     SCORE_NON_SPACE_WORD_JUMP = 0.8
     SCORE_CHARACTER_JUMP = 0.17
-    SCORE_TRANSPOSITION = 0.1
+
     PENALTY_SKIPPED = 0.999
     PENALTY_CASE_MISMATCH = 0.9999
 
