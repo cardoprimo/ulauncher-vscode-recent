@@ -20,6 +20,7 @@ from ulauncher.api.shared.action.RenderResultListAction import RenderResultListA
 from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
 from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
 import re
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -111,9 +112,6 @@ class Utils:
             else pathlib.Path(__file__).parent.absolute()
         )
         return os.path.join(base_dir, filename)
-
-
-import time
 
 
 class Code:
@@ -230,7 +228,7 @@ class Code:
         recents = []
 
         for path in entries:
-            logger.info(path)
+
             if "folderUri" in path:
                 uri = path["folderUri"]
                 icon = "icon"
@@ -260,7 +258,7 @@ class Code:
                     "type": entry_type,
                 }
             )
-        # filter the entries to only include types of the include_types
+        # filter the entries to only include types of the preferences["include_types"]
 
         recents = [recent for recent in recents if recent["type"] in include_types]
         return recents
@@ -307,7 +305,7 @@ class CodeExtension(Extension):
         return path.replace(self.home_path, "~")
 
     def get_ext_result_items(self, query):
-        query_raw = query
+
         query = query.lower() if query else ""
         recents = self.code.get_recents()
         items = []
@@ -325,7 +323,7 @@ class CodeExtension(Extension):
         # Sort the results by the score, highest first
         data = sorted(data, key=lambda x: x["score"], reverse=True)
 
-        for recent_item in data[:10]:
+        for recent_item in data[:15]:
             recent = recent_item["recent"]
 
             # get th epretty printed path
