@@ -128,7 +128,8 @@ class Code:
         self.config_path = None
         self.global_state_db = None
         self.storage_json = None
-        self.includes_types = None
+        self.include_types = None
+        self.prefer_type = None
 
         logger.debug("locating installation and config directories")
         for path in (pathlib.Path(path_dir) for path_dir in Code.path_dirs):
@@ -186,6 +187,9 @@ class Code:
         # Fetch recents from global state or legacy storage if cache is expired
         recents = []
 
+        include_types = self.include_types
+        prefer_type = self.prefer_type
+
         if self.global_state_db.exists():
             logger.debug("getting recents from global state database")
             try:
@@ -215,8 +219,9 @@ class Code:
         (json_code,) = cur.fetchone()
         paths_list = json.loads(json_code)
         entries = paths_list["entries"]
+        include_types = self.include_types
         logger.debug("found %d entries in global state database", len(entries))
-        return self.parse_entry_paths(entries)
+        return self.parse_entry_paths(entries, include_types)
 
     def get_recents_legacy(self):
         """
@@ -226,11 +231,12 @@ class Code:
         logger.debug("loading storage.json")
         storage = json.load(self.storage_json.open("r"))
         entries = storage["openedPathsList"]["entries"]
+        include_types = self.include_types
         logger.debug("found %d entries in storage.json", len(entries))
-        return self.parse_entry_paths(entries)
+        return self.parse_entry_paths(entries, include_types)
 
     @staticmethod
-    def parse_entry_paths(entries, include_types=("folder")):
+    def parse_entry_paths(entries, include_types):
         recents = []
 
         for path in entries:
@@ -264,6 +270,8 @@ class Code:
                     "type": entry_type,
                 }
             )
+
+        logger.debug('included types: %s' % include_types)
         # filter the entries to only include types of the preferences["include_types"]
 
         recents = [recent for recent in recents if recent["type"] in include_types]
