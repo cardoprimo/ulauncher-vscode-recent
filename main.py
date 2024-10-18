@@ -385,7 +385,8 @@ class PreferencesEventListener(EventListener):
     def on_event(self, event, extension):
         extension.keyword = event.preferences["code_kw"]
         extension.excluded_env_vars = event.preferences["excluded_env_vars"]
-        extension.include_types = event.preferences["include_types"].split(",")
+        extension.code.include_types = event.preferences["include_types"].split(",")
+        extension.prefer_type = event.preferences["prefer_type"]
 
 
 class PreferencesUpdateEventListener(EventListener):
@@ -394,6 +395,10 @@ class PreferencesUpdateEventListener(EventListener):
             extension.keyword = event.new_value
         if event.id == "excluded_env_vars":
             extension.excluded_env_vars = event.new_value
+        if event.id == "include_types":
+            extension.code.include_types = event.new_value.split(",")
+        if event.id == "prefer_type":
+            extension.prefer_type = event.new_value
 
 
 if __name__ == "__main__":
