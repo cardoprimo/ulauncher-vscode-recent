@@ -116,7 +116,7 @@ class Utils:
 
 class Code:
     path_dirs = ("/usr/bin", "/bin", "/snap/bin")
-    variants = ("Code", "VSCodium")
+    variants = ("Code", "Codium")
 
     # Cache for recent entries and cache expiry
     _cached_recents = None
@@ -134,7 +134,13 @@ class Code:
         for path in (pathlib.Path(path_dir) for path_dir in Code.path_dirs):
             for variant in Code.variants:
                 installed_path = path / variant.lower()
-                config_path = pathlib.Path.home() / ".config" / variant
+                if not installed_path.exists():
+                    continue
+                if variant == "Codium":
+                    variant_config = "VSCodium"
+                else:
+                    variant_config = variant
+                config_path = pathlib.Path.home() / ".config" / variant_config
                 logger.debug(
                     "evaluating installation dir %s and config dir %s",
                     installed_path,
