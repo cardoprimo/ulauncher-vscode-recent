@@ -21,7 +21,11 @@
 			"type": "input",
 			"name": "Comma separated list of file_types to include in the search, e.g. [file,folder,workspace]",
 			"default_value": "file,folder,workspace"
-	
+		},
+		{
+			"id": "prefer_type",
+			"type": "input",
+			"name": "Prefered type"
 		}
 	]
 }

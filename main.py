@@ -238,7 +238,6 @@ class Code:
     @staticmethod
     def parse_entry_paths(entries, include_types):
         recents = []
-
         for path in entries:
 
             if "folderUri" in path:
@@ -301,6 +300,7 @@ class CodeExtension(Extension):
     excluded_env_vars = None
     code = None
     include_types = None
+    prefer_type = None
 
     def __init__(self):
         super(CodeExtension, self).__init__()
@@ -324,11 +324,20 @@ class CodeExtension(Extension):
         recents = self.code.get_recents()
         items = []
         data = []
+        prefer_type = self.prefer_type
+
+        logger.debug("prefered type: %s", prefer_type)
 
         # Use command_score instead of fuzzywuzzy for scoring the label and URI
         for recent in recents:
             label_score = command_score(recent["label"], query)
             uri_score = command_score(recent["uri"], query)
+
+
+            # prefer types
+            if prefer_type and recent["type"] == prefer_type:
+                label_score *= 1.02  # increase score by 2% for workspaces
+
 
             # Only add items that have a score above a threshold
             if label_score > 0.1 or uri_score > 0.1:
@@ -391,7 +400,7 @@ class PreferencesEventListener(EventListener):
 
 class PreferencesUpdateEventListener(EventListener):
     def on_event(self, event, extension):
-        if event.id == "code_kw":
+        if event.id == "code_kw":   
             extension.keyword = event.new_value
         if event.id == "excluded_env_vars":
             extension.excluded_env_vars = event.new_value
